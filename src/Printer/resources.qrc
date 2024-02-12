@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/success.svg</file>
+        <file>images/pause.svg</file>
+        <file>images/check.svg</file>
+        <file>images/fail.svg</file>
+        <file>images/warning_logo.svg</file>
+        <file>images/warning.svg</file>
+        <file>images/printer_details.svg</file>
+        <file>images/dde-printer.svg</file>
+    </qresource>
+</RCC>
