@@ -11,7 +11,7 @@
 #include <QMutex>
 #include <QSet>
 #include <QDBusMessage>
-#include <QTime>
+#include <QElapsedTimer>
 
 #include <string>
 #include <vector>
@@ -90,7 +90,7 @@ private:
     bool m_bQuit;
 
     QSet<unsigned int> m_pendingNotification;
-    QMap<int, QTime> m_processingJob;
+    QMap<int, QElapsedTimer> m_processingJob;
 
 };
 

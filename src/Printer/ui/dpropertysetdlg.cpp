@@ -1123,8 +1123,8 @@ void DPropertySetDlg::printUriUI_EditFinished()
         return;
     }
 
-    QRegExp reg("([^# ]{1,})(:[/]{1,})([^# ]{1,})");
-    QRegExpValidator v(reg);
+    QRegularExpression reg("([^# ]{1,})(:[/]{1,})([^# ]{1,})");
+    QRegularExpressionValidator v(reg);
     int pos = 0;
     QValidator::State state = v.validate(strVal, pos);
 
@@ -1330,15 +1330,15 @@ bool DPropertySetDlg::isBishengDriver()
         return false;
     }
 
-    preference.replace(QRegExp(" "), "").replace(QRegExp("\""), "");
+    preference.replace(QRegularExpression(" "), "").replace(QRegularExpression("\""), "");
     return preference.toLower() == "true";
 }
 
 void DPropertySetDlg::preferenceClickSlot()
 {
     QStringList args;
-    QString model = getBishengInfo("PrinterName").replace(QRegExp("^ "), "").replace("\"", "");
-    QString prefix = getBishengInfo("PackageName").replace(QRegExp("^ "), "").replace(QRegExp("\""), "");
+    QString model = getBishengInfo("PrinterName").replace(QRegularExpression("^ "), "").replace("\"", "");
+    QString prefix = getBishengInfo("PackageName").replace(QRegularExpression("^ "), "").replace(QRegularExpression("\""), "");
 
     args << "setprinter" << prefix << model;
     qCInfo(COMMONMOUDLE) << args;
@@ -1351,7 +1351,7 @@ QString DPropertySetDlg::getBishengInfo(QString info)
     QString commond;
     commond += "cat " + m_strPpdName;
     if (shellCmd(commond, strOut, strErr) == 0) {
-        QStringList list = strOut.split("\n", QString::SkipEmptyParts);
+        QStringList list = strOut.split("\n", Qt::SkipEmptyParts);
         int index = 0;
         for (; index < list.size(); index++) {
             if (list[index].contains(info))
@@ -1361,7 +1361,7 @@ QString DPropertySetDlg::getBishengInfo(QString info)
             return nullptr;
         }
 
-        QStringList val = list[index].split(":", QString::SkipEmptyParts);
+        QStringList val = list[index].split(":", Qt::SkipEmptyParts);
         if (val.count() <= 1) {
             return nullptr;
         }

@@ -383,7 +383,12 @@ static QList<QMap<QString, QVariant>> getExactMatchDrivers(const QString &strMFG
     if (!modelMap)
         return list;
 
-    strKeys = modelMap->values(strMDL);
+    // Qt6中QMap::values(key)被移除，需要手动查找
+    for (auto it = modelMap->constBegin(); it != modelMap->constEnd(); ++it) {
+        if (it.key() == strMDL) {
+            strKeys.append(it.value());
+        }
+    }
     if (!strKeys.isEmpty()) {
         foreach (QString strKey, strKeys) {
             QMap<QString, QVariant> driver = stringToVariant(g_ppds.value(strKey.toLower()));
@@ -423,7 +428,8 @@ static bool addToDirct(const QString &strMake, const QString &strModel, const QS
 
     QString strkey = modelMap->value(model);
     if (strkey.isEmpty() || !g_driverManager->isSamePPD(key, strkey)) {
-        modelMap->insertMulti(model, key);
+        // Qt6中QMap::insertMulti被移除，使用insert
+        modelMap->insert(model, key);
         qCDebug(COMMONMOUDLE) << QString("Insert %1#%2#%3 to dirct").arg(makel).arg(model).arg(key);
         return true;
     } else {
@@ -730,14 +736,16 @@ int RefreshLocalPPDS::doWork()
                     modelMap = new QMap<QString, QString>();
                     g_ppdsMakeModelNames.insert(strMake, modelMap);
                 }
-                modelMap->insertMulti(strModel, key);
+                // Qt6中QMap::insertMulti被移除，使用insert
+                modelMap->insert(strModel, key);
                 ;
 
                 if (g_textPPd.isEmpty() && (ppdname.endsWith("textonly.ppd") || ppdname.endsWith("postscript.ppd")))
                     g_textPPd = list;
             }
 
-            g_ppds.insertMulti(key, list);
+            // Qt6中QMap::insertMulti被移除，使用insert
+            g_ppds.insert(key, list);
         }
         qCDebug(COMMONMOUDLE) << QString("*****************************");
     }
@@ -1438,12 +1446,13 @@ QStringList DriverManager::getDriverDepends(const char *strPPD)
             ppdMakeModelSplit(strValue, strMake, strModel);
             if (strMake.toLower() == "hp" && strValue.contains("requires proprietary plugin")) {
                 QString arch = g_Settings->getSystemArch();
-                QRegExp regex("(\\d+\\.\\d+\\.\\d+)");
-                if (regex.indexIn(strValue) == -1) {
+                QRegularExpression regex("(\\d+\\.\\d+\\.\\d+)");
+                QRegularExpressionMatch match = regex.match(strValue);
+                if (!match.hasMatch()) {
                     break;
                 }
 
-                QVersionNumber curVer = QVersionNumber::fromString(regex.cap(1));
+                QVersionNumber curVer = QVersionNumber::fromString(match.captured(1));
                 QVersionNumber baseVersion = QVersionNumber::fromString("3.18.12");
                 if (curVer <= baseVersion && !(arch.contains("mips") || arch.contains("loongarch"))) {
                     depends << "hplip-plugin";

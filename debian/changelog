@@ -1,3 +1,9 @@
+dde-printer (1.0.20gxde1) UNRELEASED; urgency=medium
+
+  * 迁移至 Qt6
+
+ -- gfdgd_xi <3025613752@qq.com>  Fri, 31 Jul 2026 19:05:43 +0800
+
 dde-printer (1.0.20-1+1060) unstable; urgency=medium
 
   * update version

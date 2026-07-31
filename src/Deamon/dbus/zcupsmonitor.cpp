@@ -94,7 +94,7 @@ static QString getPpdInfo(const QString &strPpdName, const QString &info)
     QString commond;
     commond += "cat " + strPpdName;
     if (shellCmd(commond, strOut, strErr) == 0) {
-        QStringList list = strOut.split("\n", QString::SkipEmptyParts);
+        QStringList list = strOut.split("\n", Qt::SkipEmptyParts);
         int index = 0;
         for (; index < list.size(); index++) {
             if (list[index].contains(info))
@@ -104,7 +104,7 @@ static QString getPpdInfo(const QString &strPpdName, const QString &info)
             return nullptr;
         }
 
-        QStringList val = list[index].split(":", QString::SkipEmptyParts);
+        QStringList val = list[index].split(":", Qt::SkipEmptyParts);
         if (val.count() <= 1) {
             return nullptr;
         }
@@ -118,9 +118,9 @@ static QString getPackageVerByName(const QString &packageName)
 {
     QString strOut, strErr;
     if (shellCmd(QString("dpkg -l %1").arg(packageName), strOut, strErr) == 0) {
-        QStringList list = strOut.split("\n", QString::SkipEmptyParts);
+        QStringList list = strOut.split("\n", Qt::SkipEmptyParts);
         strOut = list.isEmpty() ? "" : list.last();
-        list = strOut.split(" ", QString::SkipEmptyParts);
+        list = strOut.split(" ", Qt::SkipEmptyParts);
         return list.count() > 2 ? list[2] : QString();
     }
 
@@ -139,7 +139,8 @@ static QString replaceChineseWithAsterisk(const QString &text)
 
     for (int i = 0; i < result.length(); ++i) {
         QChar character = result[i];
-        if (character >= 0x4e00 && character <= 0x9fff) {
+        // Qt6中QChar需要使用unicode()方法进行比较
+        if (character.unicode() >= 0x4e00 && character.unicode() <= 0x9fff) {
             result.replace(i, 1, "*");
         }
     }
@@ -406,7 +407,7 @@ int CupsMonitor::getNotifications(int &notifysSize)
                 int iState = attrValueToQString(info[JOB_ATTR_STATE]).toInt();
                 int iJob = attrValueToQString(info[CUPS_NOTIY_JOBID]).toInt();
                 QString strReason = attrValueToQString(info[CUPS_NOTIY_TEXT]);
-                QStringList list = attrValueToQString(info[JOB_ATTR_NAME]).split("/", QString::SkipEmptyParts);
+                QStringList list = attrValueToQString(info[JOB_ATTR_NAME]).split("/", Qt::SkipEmptyParts);
                 QString strJobName = list.isEmpty() ? "" : list.last();
                 QString strRecordReason;
                 qCDebug(COMMONMOUDLE) << "Got a job event: " << iJob << iState << strReason;
@@ -437,14 +438,14 @@ int CupsMonitor::getNotifications(int &notifysSize)
                 switch (iState) {
                 case IPP_JSTATE_PROCESSING:
                     if (m_processingJob.contains(iJob)) {
-                        const QTime &t = m_processingJob[iJob];
-                        if (!t.isNull() && t.elapsed() > PROCESSINGTIP) {
+                        const QElapsedTimer &t = m_processingJob[iJob];
+                        if (t.isValid() && t.elapsed() > PROCESSINGTIP) {
                             strReason = tr("%1 timed out, reason: %2").arg(strJobName).arg(strReason);
                             sendDesktopNotification(0, qApp->productName(), strReason, 3000);
-                            m_processingJob[iJob] = QTime();
+                            m_processingJob[iJob].invalidate();
                         }
                     } else {
-                        QTime t;
+                        QElapsedTimer t;
                         t.start();
                         m_processingJob.insert(iJob, t);
                     }
@@ -582,7 +583,7 @@ void CupsMonitor::writeJobLog(bool isSuccess, int jobId, QString strReason)
     obj.insert("driverInfo", driverInfo);
 
     if (driverInfo.contains("Bisheng")) {
-        QString packageName = getPpdInfo(pddPath, "PackageName").replace(QRegExp("^ "), "").replace(QRegExp("\""), "");
+        QString packageName = getPpdInfo(pddPath, "PackageName").replace(QRegularExpression("^ "), "").replace(QRegularExpression("\""), "");
 
         // 获取包版本信息
         QString ver = getPackageVerByName(packageName);
@@ -633,7 +634,7 @@ int CupsMonitor::doWork()
     m_pendingNotification.clear();
     m_processingJob.clear();
 
-    QTime t;
+    QElapsedTimer t;
     t.start();
     while (!m_bQuit) {
         int size = 0;
@@ -778,7 +779,7 @@ bool CupsMonitor::isNeedUpdateSubscription(vector<string> &events)
 
 void CupsMonitor::parseSubEvents(const string &events,  std::vector<std::string> &ret)
 {
-    QStringList eventList = QString::fromStdString(events).split("`", QString::SkipEmptyParts);
+    QStringList eventList = QString::fromStdString(events).split("`", Qt::SkipEmptyParts);
     foreach (QString var, eventList) {
         string event = var.toStdString().substr(1);
         event = event.replace(event.length() - 1, 1, "");

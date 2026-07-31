@@ -7,7 +7,7 @@
 
 #include <DGuiApplicationHelper>
 #include <DFontSizeManager>
-#include <DApplicationHelper>
+#include <DPaletteHelper>
 #include <DPalette>
 #include <DTitlebar>
 
@@ -52,7 +52,7 @@ static QStringList getDesktopFilePath(const QString &packageName)
     p.waitForFinished();
 
     QString output = p.readAllStandardOutput();
-    ret = output.split("\n", QString::SkipEmptyParts);
+    ret = output.split("\n", Qt::SkipEmptyParts);
 
     return ret;
 }
@@ -87,7 +87,7 @@ void AdvanceShareWidget::click()
     emit clicked();
 }
 
-void AdvanceShareWidget::enterEvent(QEvent *event)
+void AdvanceShareWidget::enterEvent(QEnterEvent *event)
 {
     QWidget::enterEvent(event);
     m_hover = true;
@@ -122,7 +122,7 @@ void AdvanceShareWidget::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event)
 
-    const DPalette &dp = DApplicationHelper::instance()->palette(this);
+    const DPalette &dp = DPaletteHelper::instance()->palette(this);
     QPainter p(this);
     p.setPen(Qt::NoPen);
     p.setBrush(dp.brush(DPalette::ItemBackground));

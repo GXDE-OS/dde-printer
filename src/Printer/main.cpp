@@ -8,8 +8,6 @@
 #include <DApplication>
 #include <DLog>
 
-#include <DApplicationSettings>
-
 DWIDGET_USE_NAMESPACE
 DCORE_USE_NAMESPACE
 
@@ -21,8 +19,7 @@ int main(int argc, char *argv[])
 #endif
 
     int iRet = 0;
-    /*需要在构造app之前设置这个属性,自适应屏幕缩放*/
-    DApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    // Qt6中高DPI缩放默认启用，无需手动设置
     DApplication a(argc, argv);
 
     if (0 != g_printerApplication->create()) {
@@ -34,8 +31,7 @@ int main(int argc, char *argv[])
         qCritical() << "Init printer application failed";
         return -2;
     }
-    /*自动保存主题设置,需要在main里面设置*/
-    DApplicationSettings saveTheme;
+    // dtk6中主题保存功能已自动集成，无需手动设置
 
     iRet = a.exec();
     g_printerApplication->stop();

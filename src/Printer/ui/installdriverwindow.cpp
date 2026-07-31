@@ -202,7 +202,7 @@ void InstallDriverWindow::initUI()
     QVBoxLayout *pVLayoutLocal = new QVBoxLayout();
     pVLayoutLocal->addWidget(pLocalWidget, 0);
     pVLayoutLocal->addStretch();
-    pVLayoutLocal->setMargin(0);
+    pVLayoutLocal->setContentsMargins(0, 0, 0, 0);
     QWidget *pLocalWidget4 = new QWidget(this);
     pLocalWidget4->setLayout(pVLayoutLocal);
     pLocalWidget4->setAccessibleName("localWidget4_installDriver");
@@ -237,7 +237,7 @@ void InstallDriverWindow::initUI()
     QLabel *pMakerAndTypeLabel = new QLabel(tr("Vendor and Model"), this);
     m_pManuAndTypeLineEdit = new QLineEdit(this);
     m_pManuAndTypeLineEdit->setToolTip(tr("Enter a complete vendor and model (Only letters, numbers and whitespaces)"));
-    m_pManuAndTypeLineEdit->setValidator(new QRegExpValidator(QRegExp("^[a-zA-Z0-9 ]*$")));
+    m_pManuAndTypeLineEdit->setValidator(new QRegularExpressionValidator(QRegularExpression("^[a-zA-Z0-9 ]*$")));
     m_pManuAndTypeLineEdit->setAccessibleName("manuBtn_installDriver");
     m_pSearchBtn = new QPushButton(tr("Search", "button"), this);
     m_pSearchBtn->setMaximumWidth(105);
@@ -281,7 +281,7 @@ void InstallDriverWindow::initUI()
     QVBoxLayout *pVLayoutMaker = new QVBoxLayout();
     pVLayoutMaker->addWidget(pSettingWidget, 0);
     pVLayoutMaker->addStretch();
-    pVLayoutMaker->setMargin(0);
+    pVLayoutMaker->setContentsMargins(0, 0, 0, 0);
     QWidget *pSettingWidget1 = new QWidget(this);
     pSettingWidget1->setLayout(pVLayoutMaker);
     pSettingWidget1->setAccessibleName("settingWidget1_installDriver");
@@ -496,7 +496,7 @@ void InstallDriverWindow::currentMakerChangedSlot(const QString &maker)
     if (modelset) {
         m_pTypeCombo->clear();
         // 去掉重复项
-        QStringList modelList = modelset->keys().toSet().toList();
+        QStringList modelList = QSet<QString>(modelset->keys().begin(), modelset->keys().end()).values();
         modelList.sort(Qt::CaseInsensitive);
         m_pTypeCombo->addItems(modelList);
         initCompleter(TYPE, modelList);
@@ -522,12 +522,25 @@ void InstallDriverWindow::currentModelChangedSlot(const QString &model)
     if (modelset) {
         m_pDriverCombo->clear();
 
-        QStringList ppdKeys = modelset->values(model);
+        // Qt6中QMap::values(key)被移除，需要手动查找
+        QStringList ppdKeys;
+        for (auto it = modelset->constBegin(); it != modelset->constEnd(); ++it) {
+            if (it.value() == model) {
+                ppdKeys.append(it.key());
+            }
+        }
+
         const QMap<QString, QMap<QString, QString>> *ppds = g_driverManager->getPPDs();
         QStringList strValues;
 
         foreach (QString key, ppdKeys) {
-            QList<QMap<QString, QString>> list = ppds->values(key.toLower());
+            // Qt6中QMap::values(key)被移除，需要手动查找
+            QList<QMap<QString, QString>> list;
+            for (auto it = ppds->constBegin(); it != ppds->constEnd(); ++it) {
+                if (it.key() == key.toLower()) {
+                    list.append(it.value());
+                }
+            }
             for (int i = 0; i < list.count(); i++) {
                 QString strPpd = list[i].value("ppd-name");
                 QString ppdname = list[i].value("ppd-make-and-model");

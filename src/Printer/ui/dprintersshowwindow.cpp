@@ -23,7 +23,7 @@
 
 #include <DDialog>
 #include <DMessageBox>
-#include <DImageButton>
+#include <DIconButton>
 #include <DSettingsDialog>
 #include <DTitlebar>
 #include <DApplication>
@@ -31,7 +31,7 @@
 #include <DFrame>
 #include <DBackgroundGroup>
 #include <DErrorMessage>
-#include <DApplicationHelper>
+#include <DPaletteHelper>
 #include <DToolButton>
 
 #ifdef DTKWIDGET_CLASS_DSizeMode
@@ -216,7 +216,7 @@ void DPrintersShowWindow::initUI()
     QLabel *pLabelLocation = new QLabel(tr("Location:"));
     DFontSizeManager::instance()->bind(pLabelLocation, DFontSizeManager::T8, QFont::Medium);
     QFontMetrics fm(pLabelLocation->font());
-    pLabelLocation->setFixedWidth(fm.width(pLabelLocation->text()) + 10);
+    pLabelLocation->setFixedWidth(fm.horizontalAdvance(pLabelLocation->text()) + 10);
     m_pLabelLocationShow = new QLabel(tr(""));
     DFontSizeManager::instance()->bind(m_pLabelLocationShow, DFontSizeManager::T8, QFont::Medium);
     m_pLabelLocationShow->setFixedWidth(255);
@@ -1288,7 +1288,7 @@ void BackgroundWidget::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event)
 
-    const DPalette &dp = DApplicationHelper::instance()->palette(this);
+    const DPalette &dp = DPaletteHelper::instance()->palette(this);
     QPainter p(this);
     p.setPen(Qt::NoPen);
     p.setBrush(dp.brush(DPalette::ItemBackground));

@@ -1,4 +1,7 @@
-QT += network sql
+QT += network sql core
+
+# C++17 is required for Qt6
+CONFIG += c++17
 
 INCLUDEPATH +=  \
                 $$PWD/../cppcups \

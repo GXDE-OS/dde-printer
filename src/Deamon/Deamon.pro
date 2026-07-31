@@ -1,11 +1,9 @@
-QT += core dbus
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT += core dbus widgets
 
 TARGET = dde-printer-helper
 TEMPLATE = app
-CONFIG += c++11 link_pkgconfig
-PKGCONFIG += dtkwidget dtkgui
+CONFIG += c++17 link_pkgconfig
+PKGCONFIG += dtk6widget dtk6gui dtk6core
 
 SOURCES += \
         main.cpp \

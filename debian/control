@@ -2,21 +2,21 @@ Source: dde-printer
 Section: misc
 Priority: optional
 Maintainer: Deepin Sysdev <sysdev@linuxdeepin.com>
-Build-Depends: 
+Build-Depends:
  debhelper-compat (= 11),
- qtbase5-dev,
- qttools5-dev-tools,
- libdtkcore-dev,
- libdtkwidget-dev,
- libdtkgui-dev,
+ qt6-base-dev,
+ qt6-tools-dev,
+ libdtk6core-dev,
+ libdtk6widget-dev,
  pkg-config,
  g++ (>= 8.3.0),
  libcups2-dev,
- qt5-qmake,
+ qmake6,
  libsmbclient-dev,
  libgnutls28-dev,
  libusb-1.0-0-dev,
- libgtest-dev
+ libgtest-dev,
+ libsmbclient-dev
 Standards-Version: 4.1.3
 Homepage: http://www.linuxdeepin.com/
 
