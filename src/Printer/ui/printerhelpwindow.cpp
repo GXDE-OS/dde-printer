@@ -465,7 +465,15 @@ void PrinterManufacturerItem::setMfgText(const QString &text)
 
 void PrinterManufacturerItem::setItemIcon(const QString &iconPath)
 {
-    m_manufacturerIcon->setPixmap(QPixmap(iconPath));
+    // 修复在高分屏下使用说明——打印驱动下载页品牌图标模糊的问题
+    qreal dpr = this->devicePixelRatioF();
+    QSize targetPixelSize = m_manufacturerIcon->size() * dpr;
+    QPixmap pixmap = QIcon(iconPath).pixmap(targetPixelSize);
+    if (pixmap.size() != targetPixelSize) {
+        pixmap = pixmap.scaled(targetPixelSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    }
+    pixmap.setDevicePixelRatio(dpr);
+    m_manufacturerIcon->setPixmap(pixmap);
 }
 
 void PrinterManufacturerItem::setLinkText(const QString &text)
